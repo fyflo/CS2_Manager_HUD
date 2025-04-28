@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>CS2 Team Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/png">
+
+    
+
+</head>
+<body>
+    <div class="app-container">
+        <!-- Боковое меню -->
+        <nav class="sidebar">
+            <div class="sidebar">
+                <div class="logo">
+                    <img src="/images/logo.png" alt="CS2 Manager">
+                    <h1 data-i18n="appTitle">CS2 Manager</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <button class="nav-button" data-section="match-section">
+                            <i class="fas fa-gamepad"></i>
+                            <span data-i18n="navCreateMatch">Создать Матч</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-button" data-section="teams-section">
+                            <i class="fas fa-users"></i>
+                            <span data-i18n="navCreateTeam">Создать Команду</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-button" data-section="players-section">
+                            <i class="fas fa-user"></i>
+                            <span data-i18n="navCreatePlayer">Создать Игрока</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-button" data-section="scoreboard-section">
+                            <i class="fas fa-table"></i>
+                            <span data-i18n="navScoreboard">Скорборд</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-button" data-section="huds-section">
+                            <i class="fas fa-desktop"></i>
+                            <span data-i18n="navHuds">HUD'ы</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-button active" data-section="cs2-section">
+                            <i class="fas fa-gamepad"></i>
+                            <span data-i18n="navCS2Integration">CS2 Интеграция</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="language-selector-container">
+            <div><label for="language-selector" data-i18n="languageSelector">language:</label></div>
+                <select id="language-selector" class="form-control">
+                  <option value="ru">Русский</option>
+                  <option value="en">English</option>
+                  <option value="zh">中文</option>
+                </select>
+              </div>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Секция матча -->
+            <section id="match-section" class="content-section active">
+                <h2 data-i18n="matchSection">Создать Матч</h2>
+                <div class="match-creator">
+                    <form id="createMatchForm">
+                        <div class="form-group">
+                            <label for="team1Select" data-i18n="team1">Команда 1</label>
+                            <select id="team1Select" required>
+                                <option value="">Выберите команду</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="team2Select" data-i18n="team2">Команда 2</label>
+                            <select id="team2Select" required>
+                                <option value="">Выберите команду</option>
+                            </select>
+                            
+                        </div>
+                    
+                        <button type="submit" class="save-btn" data-i18n="createMatch">Создать матч</button>
+                    </form>
+                </div>
+                 <!-- Добавляем список матчей -->
+                <div class="matches-list">
+                    <h3 data-i18n="currentMatches">Текущие матчи</h3>
+
+                <div class="matches-container" id="matches-list">
+                    <!-- Матчи будут добавляться динамически через JavaScript -->
+                </div>
+                </div>
+                <div id="editMatchModal" class="modal">
+                    <div class="modal-content">
+                        <span data-i18n="editMatch">Редактор матча</span>
+                        <form id="editMatchForm">
+                            <div class="team-container-edit">
+                                <div class="form-group">
+                                    <label id="editTeam1Label" for="editTeam1" data-i18n="team1">Команда 1:</label>
+                                    <select name="team1" id="editTeam1" required>
+                                        <option data-i18n="selectTeam" value="">Выберите команду</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label id="editTeam2Label" for="editTeam2" data-i18n="team2">Команда 2:</label>
+                                    <select name="team2" id="editTeam2" required>
+                                        <option data-i18n="selectTeam" value="">Выберите команду</option>
+                                    </select>
+                                </div>
+                                <button type="button" id="editSwapTeamsBtn">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                            </div>
+                            <div class="team-container-edit2">
+                                <div class="form-group">
+                                    <label id="editFormatLabel" for="editFormat" data-i18n="format">Формат:</label>
+                                    <select name="format" id="editFormat" required>
+                                    <option value="bo1">BO1</option>
+                                    <option value="bo2">BO2</option>
+                                    <option value="bo3">BO3</option>
+                                    <option value="bo5">BO5</option>
+                                </select>
+                            </div>
+                            </div>
+                            <div id="maps-save-btn" class="maps-save-btn">                            
+                             <button data-i18n="save" type="submit">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+            <!-- Секция команд -->
+            <!-- В секции teams-section -->
+            <div id="teams-section" class="content-section">
+                <div class="form-container">
+                    <form id="team-form" enctype="multipart/form-data">
+                        <input data-i18n="teamName" type="text" name="name" placeholder="Название команды" required>
+                        <input data-i18n="teamRegion" type="text" name="region" placeholder="Регион">
+                        <div class="file-input-container">
+                            <input id="team-logo" type="file" name="logo" id="team-logo" accept="image/*">
+                            <label id="team-logo-label" for="team-logo">Выберите логотип команды</label>
+                        </div>
+                        <button data-i18n="addTeam" type="submit">Добавить команду</button>
+                    </form>
+                </div>
+                <div class="section-header">
+                    <h2 data-i18n="teamManagement">Управление командами</h2>
+                </div>
+                <div class="teams-container" id="teams-list">
+                    <!-- Команды будут добавлены динамически -->
+                </div>
+            </div>
+            <!-- Секция игроков -->
+            <section id="players-section" class="content-section">
+                <h2 data-i18n="playerManagement">Управление игроками</h2>
+                <form id="player-form">
+                    <input data-i18n="playerNickname" type="text" name="nickname" placeholder="Никнейм" required>
+                    <input data-i18n="playerRealName" type="text" name="realName" placeholder="Реальное имя">
+                    <input data-i18n="playerSteam64" type="text" name="steam64" placeholder="Steam64 ID" required>
+                    <select name="teamId">
+                        <option data-i18n="selectTeam" value="">Выберите команду</option>
+                    </select>
+                    <input type="file" name="avatar" accept="image/*">
+                    <button data-i18n="addPlayer" type="submit">Добавить игрока</button>
+                </form>
+                <div id="players-list" class="players-container"></div>
+            </section>
+
+            <!-- В index.html, секция скорборда -->
+            <section id="scoreboard-section" class="content-section">
+                <h2 data-i18n="scoreboardSection">Скорборд</h2>
+                <div class="scoreboard">
+                    <div class="team-scores">
+                    </div>
+                    <div class="player-stats-table">
+                        <!-- Таблица будет заполняться динамически -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Секция HUD'ов -->
+            <section id="huds-section" class="content-section">
+                <h2 data-i18n="hudsSection">Доступные HUD'ы</h2>
+                <div id="huds-list" class="huds-grid"></div>
+            </section>
+            <section id="cs2-section" class="content-section">
+                <div class="container mt-5">
+                    <div class="row">
+                        <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                            <h5 id="cs2-integration-title" class="mb-0" data-i18n="cs2Integration">CS2 Интеграция</h5>
+                            </div>
+                            <div class="card-body">
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                <h6 id="cs2-configs-status" data-i18n="cs2ConfigsStatus">Статус конфигов</h6>
+                                <p><span id="cs2-config-path-label">Путь к конфигам:</span> <span id="cs2-path">Проверка...</span></p>
+                                <p id="cs2-gsi-status">Проверка статуса GSI конфига...</p>
+                                <p id="cs2-observer-status">Проверка статуса Observer конфига...</p>
+                                <p id="cs2-observer2-status">Проверка статуса Observer_map_cs2_on конфига...</p>
+                                <p id="cs2-observer_off-status">Проверка статуса Observer_off конфига...</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                <input type="text" id="cs2-custom-path" class="form-control" placeholder="Путь к CS2 (без game/csgo/cfg)">
+                                </div>
+                                <div class="col-md-4">
+                                <button id="check-cs2-path" class="btn btn-secondary" data-i18n="cs2CheckPath">Проверить путь</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                <button id="install-cs2-configs" class="btn btn-primary btn-block" data-i18n="cs2InstallConfigs">Установить конфиги CS2</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Скрипты -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="/js/gsiManager.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/overlayManager.js"></script>
+    <script src="/js/localization.js"></script>
+
+</body>
+</html>
