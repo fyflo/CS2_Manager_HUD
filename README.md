@@ -22,3 +22,6 @@ CS2_Manager_HUD
 ![image](https://github.com/user-attachments/assets/6a2bba20-18b0-4857-8c18-b02558214d47)
 
 ![image](https://github.com/user-attachments/assets/1bf7bef3-f37b-42e1-a29b-0bfdc56089b6)
+
+Дифолтный ХУД
+![image](https://github.com/user-attachments/assets/fa3ee83c-5fe3-4138-b91f-ef61618e0c68)
