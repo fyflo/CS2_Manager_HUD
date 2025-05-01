@@ -1727,7 +1727,6 @@ app.put('/api/teams/:id', upload.single('logo'), (req, res) => {
     
     db.get('SELECT id FROM teams WHERE id = ?', [teamId], (err, team) => {
         if (err) {
-            //console.error('Ошибка при проверке команды:', err);
             return res.status(500).json({ message: 'Ошибка сервера' });
         }
         
@@ -1735,13 +1734,14 @@ app.put('/api/teams/:id', upload.single('logo'), (req, res) => {
             return res.status(404).json({ message: `Команда с ID ${teamId} не найдена` });
         }
         
-        const logo = req.file ? `/uploads/${req.file.filename}` : null;
+        // Сохраняем только имя файла, без /uploads/
+        const logo = req.file ? req.file.filename : null;
         let updateQuery = 'UPDATE teams SET name = ?, region = ?';
         let params = [name, region];
 
         if (logo) {
             updateQuery += ', logo = ?';
-            params.push(logo);
+            params.push(logo); // Теперь сохраняем только имя файла
         }
 
         updateQuery += ' WHERE id = ?';
@@ -1749,7 +1749,6 @@ app.put('/api/teams/:id', upload.single('logo'), (req, res) => {
 
         db.run(updateQuery, params, function(err) {
             if (err) {
-                //console.error('Ошибка при обновлении:', err);
                 return res.status(500).json({ message: 'Ошибка при обновлении команды' });
             }
 
