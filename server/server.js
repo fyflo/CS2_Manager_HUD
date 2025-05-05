@@ -2860,3 +2860,61 @@ if (now - global.lastGsiUpdate > global.gsiThrottleInterval) {
     global.lastGsiUpdate = now;
     io.emit('gsi', gameState);
 }
+
+// Добавьте эти переменные в начало модуля радара
+const NodeCache = require('node-cache');
+const radarCache = new NodeCache({ stdTTL: 5, checkperiod: 10 });
+const throttle = require('lodash.throttle');
+
+// Кэширование данных игроков и буферизация обновлений
+let playersBuffer = {};
+let updatesPending = false;
+
+// Дросселирование функции обновления позиций
+const updateRadarPositions = throttle(function() {
+    // Код обновления позиций игроков на радаре
+    for (const steamId in playersBuffer) {
+        const playerData = playersBuffer[steamId];
+        // Обновление DOM
+    }
+    playersBuffer = {};
+    updatesPending = false;
+}, 16); // ~60fps
+
+// Вместо прямого обновления при получении данных
+function handleGsiUpdate(data) {
+    // Буферизация данных
+    if (data.allplayers) {
+        for (const [steamId, player] of Object.entries(data.allplayers)) {
+            // Кэшируем предыдущую позицию для сравнения
+            const prevPos = radarCache.get(`player_${steamId}_pos`);
+            const currentPos = player.position;
+            
+            // Обновляем только при значительном изменении позиции
+            if (!prevPos || 
+                Math.abs(prevPos.x - currentPos.x) > 5 || 
+                Math.abs(prevPos.y - currentPos.y) > 5) {
+                
+                // Сохраняем в буфер и кэш
+                playersBuffer[steamId] = player;
+                radarCache.set(`player_${steamId}_pos`, currentPos);
+                
+                if (!updatesPending) {
+                    updatesPending = true;
+                    requestAnimationFrame(updateRadarPositions);
+                }
+            }
+        }
+    }
+}
+
+// Оптимизация очистки неиспользуемых элементов
+// Вызывайте эту функцию реже, например каждые 30 кадров
+let cleanupCounter = 0;
+function cleanupUnusedElements() {
+    cleanupCounter++;
+    if (cleanupCounter < 30) return;
+    cleanupCounter = 0;
+    
+    // Код очистки неиспользуемых элементов
+}
