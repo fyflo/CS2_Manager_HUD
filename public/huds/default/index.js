@@ -1094,7 +1094,7 @@ function fillPlayer(allplayers, teams, player, nr, side, observed, phase, previo
   $player.find("#player_dead_assists_text").text(match_stats.assists);
   $kda_money.find("#player_deaths_d").css("color", side_color);
   $kda_money.find("#player_deaths_text").text(match_stats.deaths);
-  $player.find("#player_dead_deaths_text").text(stats.deaths);
+  $player.find("#player_dead_deaths_text").text(match_stats.deaths);
 
   if (dead) {
     $bottom.find("#player_bomb_kit_image").css("opacity", 0);
