@@ -3864,6 +3864,9 @@ function updateMapsContainerWithElements(
                     <option value="de_ancient">Ancient</option>
                     <option value="de_anubis">Anubis</option>
                     <option value="de_vertigo">Vertigo</option>
+                    <option value="de_train">Train</option>
+                    <option value="de_cobblestone">Cobblestone</option>
+                    <option value="de_cache">Cache</option>
                 </select>
                 <select class="pick-team-select">
                     <option value="" data-i18n="selectTeam">Выберите команду</option>
@@ -3923,6 +3926,9 @@ function updateMapsContainerWithElements(
                     <option value="de_ancient">Ancient</option>
                     <option value="de_anubis">Anubis</option>
                     <option value="de_vertigo">Vertigo</option>
+                    <option value="de_train">Train</option>
+                    <option value="de_cobblestone">Cobblestone</option>
+                    <option value="de_cache">Cache</option>
                 </select>
                 <select class="pick-team-select">
                     <option value="" data-i18n="selectTeam">Выберите команду</option>
