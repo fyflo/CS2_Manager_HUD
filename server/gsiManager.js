@@ -186,3 +186,9 @@ window.sendMatchDataToHUD = function(matchId) {
 window.updateMatchStatus = function(matchId, status) {
     return window.gsiManager.updateMatchStatus(matchId, status);
 };
+
+window.gsiManager.sendToHUD({
+    type: 'camera_link',
+    steamid,
+    link
+});
