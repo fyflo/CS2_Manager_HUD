@@ -1,3 +1,5 @@
+[MY DISCORD](https://discord.gg/Kh5NMW3P ) We discuss, propose and try to implement together.
+
 # CS2 HUD Manager
 
 ## Описание
