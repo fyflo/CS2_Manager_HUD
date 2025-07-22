@@ -30,6 +30,7 @@ module.exports = {
   cs2GsiInstalledPartial: "GSI 已安装。",
   cs2ObserverInstalledPartial: "Observer 已安装。",
   cs2InstallError: "安装配置时出错：",
-  
+  removeCS2Configs: "删除 CS2 配置"
+
   // 可以根据需要添加其他翻译
 };

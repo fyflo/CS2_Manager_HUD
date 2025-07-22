@@ -30,6 +30,7 @@ module.exports = {
     cs2GsiInstalledPartial: "GSI установлен. ",
     cs2ObserverInstalledPartial: "Observer установлен. ",
     cs2InstallError: "Ошибка при установке конфигов: ",
-    
+    removeCS2Configs: "Удалить конфиги CS2"
+
     // Другие переводы можно добавить по мере необходимости
   };

@@ -1,6 +1,10 @@
 class GSIManager {
     constructor() {
-        this.socket = io('http://127.0.0.1:2626', {
+        // Используем тот же IP и порт, что определены в main.js
+        const serverIPAddress = window.serverIP || localStorage.getItem('serverIP') || '127.0.0.1';
+        const serverPortNumber = window.serverPort || localStorage.getItem('serverPort') || 2626;
+        
+        this.socket = io(`http://${serverIPAddress}:${serverPortNumber}`, {
             withCredentials: true,
             transports: ['websocket', 'polling']
         });
@@ -28,7 +32,6 @@ class GSIManager {
             bomb: { state: "" },
             grenades: {},
             previously: {},
-
         };
 
         this.callbacks = [];
@@ -68,6 +71,16 @@ class GSIManager {
 
     getGameState() {
         return this.gameState;
+    }
+    
+    // Добавляем метод для отправки данных на сервер
+    sendToHUD(data) {
+        if (this.socket && this.socket.connected) {
+            console.log('Отправка данных в HUD:', data);
+            this.socket.emit('hud_data', data);
+        } else {
+            console.error('Невозможно отправить данные: соединение не установлено');
+        }
     }
 }
 

@@ -2,7 +2,7 @@
   "COLOR_CT": "rgba(40, 120, 240, 1)",
   "COLOR_T": "rgba(229, 11, 11, 1)",
   "COLOR_NEW_CT": "rgba(40, 120, 240, 1)",
-  "COLOR_NEW_T": "rgba(666, 11, 11, 1)",
+  "COLOR_NEW_T": "rgba(229, 11, 11, 1)",
   "COLOR_RED": "rgba(229, 11, 11, 1.0)",
   "COLOR_CT_SPECTATOR": "linear-gradient(0deg, rgba(40, 120, 240,1) 0%, rgba(40, 120, 240,0.623) 100%)",
   "COLOR_T_SPECTATOR": "linear-gradient(0deg, rgba(229, 11, 11,1) 0%, rgba(229, 11, 11, 0.623) 100%)",

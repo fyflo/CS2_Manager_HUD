@@ -9,7 +9,42 @@ const hudManager = {
             window.gsiManager.subscribe((data) => {
                 this.handleGSIData(data);
             });
+            // Подписка на кастомные события типа hide_players
+            window.gsiManager.subscribe((event) => {
+                if (event && event.type === 'hide_players' && Array.isArray(event.steamids)) {
+                    // Сохраняем steamid в localStorage
+                    localStorage.setItem('hiddenSteamId1', event.steamids[0] || '');
+                    localStorage.setItem('hiddenSteamId2', event.steamids[1] || '');
+                    gsiHiddenSteamIds = event.steamids;
+                    // Принудительно обновляем игроков, если данные уже есть
+                    if (window.gsiDataBuffer && window.gsiDataBuffer.allplayers) {
+                        hudManager.updatePlayers(window.gsiDataBuffer.allplayers);
+                    }
+                }
+            });
         }
+
+        // Функция для исправления путей к аватаркам
+        this.fixAvatarPaths = function() {
+            // Ищем все изображения с аватарками игроков
+            const avatarImages = document.querySelectorAll('.player-avatar img, .avatar-image');
+            
+            avatarImages.forEach(img => {
+                if (img.src && !img.src.includes('/uploads/') && !img.src.includes('default-avatar.png')) {
+                    // Получаем имя файла из пути
+                    const filename = img.src.split('/').pop();
+                    
+                    // Устанавливаем новый путь с префиксом /uploads/
+                    img.src = `/uploads/${filename}`;
+                    console.log('Fixed avatar path:', img.src);
+                }
+            });
+        };
+
+        // Запускаем функцию исправления путей к аватаркам
+        this.fixAvatarPaths();
+        setTimeout(() => this.fixAvatarPaths(), 1000);
+        setTimeout(() => this.fixAvatarPaths(), 3000);
 
         // Обработка данных GSI
         this.handleGSIData = (data) => {
@@ -51,6 +86,8 @@ const hudManager = {
                 // Обновляем игроков
                 if (data.allplayers) {
                     this.updatePlayers(data.allplayers);
+                    // Запускаем исправление путей после обновления игроков
+                    setTimeout(() => this.fixAvatarPaths(), 100);
                 }
 
                 // Обновляем информацию о бомбе
@@ -73,7 +110,17 @@ const hudManager = {
         ctContainer.innerHTML = '';
         tContainer.innerHTML = '';
 
-        Object.values(players).forEach(player => {
+        // Получаем скрываемые Steam64 ID из localStorage и из GSI
+        const hiddenSteamId1 = localStorage.getItem('hiddenSteamId1') || '';
+        const hiddenSteamId2 = localStorage.getItem('hiddenSteamId2') || '';
+        // Если пришли ID через GSI — используем их, иначе localStorage
+        const hideIds = gsiHiddenSteamIds.length ? gsiHiddenSteamIds : [hiddenSteamId1, hiddenSteamId2];
+        // Фильтруем игроков
+        const filteredPlayers = Object.values(players).filter(player => {
+            return !hideIds.includes(player.steamid);
+        });
+
+        filteredPlayers.forEach(player => {
             const playerCard = `
                 <div class="player-card ${player.team.toLowerCase()}">
                     <div class="player-info">
@@ -98,6 +145,9 @@ const hudManager = {
                 tContainer.insertAdjacentHTML('beforeend', playerCard);
             }
         });
+        
+        // Запускаем исправление путей после обновления игроков
+        this.fixAvatarPaths();
     },
 
     updateBomb: function(bomb) {

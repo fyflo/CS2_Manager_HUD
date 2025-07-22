@@ -42,12 +42,21 @@ function translatePage() {
     elements.forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (key && i18nTranslations[key]) {
-        // Для input с placeholder обрабатываем иначе
-        if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
+        // Для input с placeholder обрабатываем placeholder, а не textContent
+        if (el.tagName === 'INPUT') {
+          // Обновляем placeholder, даже если атрибут placeholder не существует изначально
           el.setAttribute('placeholder', i18nTranslations[key]);
-        } else {
+          //console.log('Обновлен placeholder для', key, 'на', i18nTranslations[key]);
+        } 
+        // Особая обработка для опций select
+        else if (el.tagName === 'OPTION') {
+          el.text = i18nTranslations[key];
+        }
+        else {
           el.textContent = i18nTranslations[key];
         }
+      } else {
+        //console.log('Нет перевода для ключа:', key);
       }
     });
     
@@ -55,7 +64,33 @@ function translatePage() {
     if (i18nTranslations.appTitle) {
       document.title = i18nTranslations.appTitle;
     }
+    
+    // Особая обработка для селекторов команд
+    updateTeamSelectors();
+}
+
+// Обновить селекторы команд с переводами
+function updateTeamSelectors() {
+  // Находим все селекторы команд
+  const teamSelectors = document.querySelectorAll('.team-selector');
+  
+  // Если нет селекторов команд, просто выходим из функции
+  if (!teamSelectors.length) {
+    return;
   }
+  
+  // Обрабатываем каждый селектор
+  teamSelectors.forEach(selector => {
+    const options = selector.querySelectorAll('option');
+    options.forEach(option => {
+      // Если у опции есть атрибут data-i18n-team, используем его для перевода
+      const teamKey = option.getAttribute('data-i18n-team');
+      if (teamKey && i18nTranslations[teamKey]) {
+        option.text = i18nTranslations[teamKey];
+      }
+    });
+  });
+}
 
 // Инициализировать выбор языка
 function initializeLanguage() {
