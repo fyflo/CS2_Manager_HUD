@@ -16,10 +16,11 @@ function createWindow() {
         y: 0,
         transparent: true,
         frame: false,
-        fullscreen: true,
+        titleBarOverlay: false,
+        fullscreen: false,
         alwaysOnTop: true,
-        skipTaskbar: true,
-        type: 'toolbar',
+        skipTaskbar: false,
+        type: 'normal',
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -31,8 +32,16 @@ function createWindow() {
         }
     });
 
-    // Делаем окно кликпрозрачным
-    mainWindow.setIgnoreMouseEvents(true, { forward: true });
+    // Делаем окно кликпрозрачным, но с возможностью переключения
+    let isClickThrough = true;
+    mainWindow.setIgnoreMouseEvents(isClickThrough, { forward: true });
+
+    // Добавляем горячую клавишу для переключения режима кликпрозрачности
+    globalShortcut.register('Alt+C', () => {
+        isClickThrough = !isClickThrough;
+        mainWindow.setIgnoreMouseEvents(isClickThrough, { forward: true });
+        console.log(`Кликпрозрачность ${isClickThrough ? 'включена' : 'выключена'}`);
+    });
 
     // Получаем HUD ID из аргументов командной строки
     const hudArg = process.argv.find(arg => arg.startsWith('--hud='));
@@ -70,6 +79,9 @@ function createWindow() {
 
     // Регистрируем горячие клавиши
     registerShortcuts();
+
+    // Отключаем кнопки управления окном
+    mainWindow.setWindowButtonVisibility(false);
 }
 
 function registerShortcuts() {
