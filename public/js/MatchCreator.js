@@ -1,6 +1,6 @@
 class MatchCreator {
     constructor() {
-        this.maps = ['Ancient', 'Anubis', 'Inferno', 'Mirage', 'Nuke', 'Overpass', 'Vertigo'];
+        this.maps = ['Ancient', 'Anubis', 'Inferno', 'Mirage', 'Nuke', 'Overpass', 'Vertigo', 'Dust2', 'Train', 'Cobblestone'];
         this.selectedTeams = { team1: null, team2: null };
         this.selectedMaps = [];
         this.initializeUI();
