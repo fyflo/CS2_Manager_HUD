@@ -438,12 +438,17 @@ function updateActivePlayer(allplayers, player) {
     if (side === "left") {
       playerNumber = currentPlayer.observer_slot + 1;
     } else {
-      if (currentPlayer.observer_slot === 10) {
-        playerNumber = 6; // T: 10->6 (отображается как 11)
+      // Используем ту же логику, что и в функции updatePlayerElement
+      if (currentPlayer.observer_slot === 9) {
+        playerNumber = 5; // T: 9->5 (отображается как 0)
+      } else if (currentPlayer.observer_slot >= 5 && currentPlayer.observer_slot < 9) {
+        playerNumber = currentPlayer.observer_slot - 4; // T: 5->1, 6->2, 7->3, 8->4
+      } else if (currentPlayer.observer_slot === 10) {
+        playerNumber = 6; // T: 10->6
       } else if (currentPlayer.observer_slot === 11) {
-        playerNumber = 7; // T: 11->7 (отображается как 12)
+        playerNumber = 7; // T: 11->7
       } else {
-        playerNumber = currentPlayer.observer_slot - 4; // T: 5->1, 6->2, ..., 9->5
+        playerNumber = currentPlayer.observer_slot - 4;
       }
     }
 
@@ -1512,13 +1517,15 @@ function fillPlayer(
   let $player = $("#" + side).find("#player" + (nr + 1));
 
   // Обновляем номер слота игрока
-  // Для слотов 10 и 11 отображаем номера 11 и 12
-  if (slot === 10) {
+  // Используем ту же логику, что и в функции formatObserverSlot
+  if (slot === 9) {
+    $player.find(".player_slot_number").text("0");
+  } else if (slot === 10) {
     $player.find(".player_slot_number").text("11");
   } else if (slot === 11) {
     $player.find(".player_slot_number").text("12");
   } else {
-    $player.find(".player_slot_number").text(slot);
+    $player.find(".player_slot_number").text(slot + 1);
   }
 
   $player
@@ -1835,12 +1842,17 @@ function updatePlayerNames(allplayers) {
     if (side === "left") {
       playerNumber = slot + 1;
     } else {
-      if (slot === 10) {
+      // Используем ту же логику, что и в функции updatePlayerElement
+      if (slot === 9) {
+        playerNumber = 5; // T: 9->5 (отображается как 0)
+      } else if (slot >= 5 && slot < 9) {
+        playerNumber = slot - 4; // T: 5->1, 6->2, 7->3, 8->4
+      } else if (slot === 10) {
         playerNumber = 6; // T: 10->6
       } else if (slot === 11) {
         playerNumber = 7; // T: 11->7
       } else {
-        playerNumber = slot - 4; // T: 5->1, 6->2, ..., 9->5
+        playerNumber = slot - 4;
       }
     }
     
@@ -3091,7 +3103,7 @@ function createPlayerElement(player, steamid) {
   function formatObserverSlot(slot) {
     // Удаляем console.log, который может замедлять работу
     const slotNumber = parseInt(slot);
-  return slotNumber === 9 ? "0" : (slotNumber + 1).toString();
+    return slotNumber === 9 ? "0" : (slotNumber + 1).toString();
   }
   
   function createSlotElement(player) {
