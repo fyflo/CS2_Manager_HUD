@@ -436,6 +436,7 @@ db.serialize(() => {
         teamId INTEGER,
         avatar TEXT,
         cameraLink TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(teamId) REFERENCES teams(id)
     )`);
 
@@ -523,6 +524,62 @@ db.serialize(() => {
           return;
         }
         console.log("Столбец cameraLink успешно добавлен в таблицу players");
+      });
+    }
+    
+    // Проверяем наличие колонки created_at
+    const hasCreatedAtColumn =
+      Array.isArray(rows) && rows.some((row) => row.name === "created_at");
+      
+    if (!hasCreatedAtColumn) {
+      console.log("Добавляем колонку created_at в таблицу players...");
+      // Создаем новую таблицу с нужной структурой
+      db.run(`
+          CREATE TABLE IF NOT EXISTS players_new (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              nickname TEXT NOT NULL,
+              realName TEXT,
+              steam64 TEXT,
+              teamId INTEGER,
+              avatar TEXT,
+              cameraLink TEXT,
+              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+              FOREIGN KEY(teamId) REFERENCES teams(id)
+          )
+      `, (err) => {
+          if (err) {
+              console.error("Ошибка при создании новой таблицы players_new:", err);
+              return;
+          }
+          
+          // Копируем данные из старой таблицы
+          db.run(`
+              INSERT INTO players_new (id, nickname, realName, steam64, teamId, avatar, cameraLink)
+              SELECT id, nickname, realName, steam64, teamId, avatar, cameraLink FROM players
+          `, (err) => {
+              if (err) {
+                  console.error("Ошибка при копировании данных в новую таблицу:", err);
+                  return;
+              }
+              
+              // Удаляем старую таблицу
+              db.run("DROP TABLE players", (err) => {
+                  if (err) {
+                      console.error("Ошибка при удалении старой таблицы:", err);
+                      return;
+                  }
+                  
+                  // Переименовываем новую таблицу
+                  db.run("ALTER TABLE players_new RENAME TO players", (err) => {
+                      if (err) {
+                          console.error("Ошибка при переименовании таблицы:", err);
+                          return;
+                      }
+                      
+                      console.log("Таблица players успешно обновлена с колонкой created_at");
+                  });
+              });
+          });
       });
     }
   });
@@ -2257,136 +2314,8 @@ app.get("/api/players", (req, res) => {
   });
 });
 
-app.post("/api/players", upload.single("avatar"), (req, res) => {
-  const { nickname, realName, steam64, teamId, cameraLink } = req.body;
-  // Сохраняем только имя файла, без /uploads/
-  const avatar = req.file ? req.file.filename : null;
+// Дублирующие маршруты игроков были удалены, так как они уже обрабатываются через app.use("/api/players", playersRoutes)
 
-  db.run(
-    "INSERT INTO players (nickname, realName, steam64, teamId, avatar, cameraLink) VALUES (?, ?, ?, ?, ?, ?)",
-    [nickname, realName, steam64, teamId, avatar, cameraLink || null],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({ id: this.lastID });
-    }
-  );
-});
-
-app.delete("/api/players/:id", async (req, res) => {
-  try {
-    const playerId = req.params.id;
-
-    // Используем правильный метод для sqlite3
-    db.run("DELETE FROM players WHERE id = ?", [playerId], function (err) {
-      if (err) {
-        //console.error('Ошибка при удалении:', err);
-        return res.status(500).json({ message: "Ошибка при удалении игрока" });
-      }
-
-      // this.changes показывает количество затронутых строк
-      if (this.changes === 0) {
-        return res
-          .status(404)
-          .json({ message: `Игрок с ID ${playerId} не найден` });
-      }
-
-      res.json({ message: "Игрок успешно удален" });
-    });
-  } catch (error) {
-    //console.error('Ошибка при удалении игрока:', error);
-    res.status(500).json({ message: "Внутренняя ошибка сервера" });
-  }
-});
-
-// Маршрут для получения данных одного игрока
-app.get("/api/players/:id", (req, res) => {
-  const playerId = req.params.id;
-
-  // Используем более подробный запрос, включая информацию о команде
-  const query = `
-        SELECT 
-            players.*,
-            teams.name as teamName
-        FROM players 
-        LEFT JOIN teams ON players.teamId = teams.id
-        WHERE players.id = ?
-    `;
-
-  db.get(query, [playerId], (err, player) => {
-    if (err) {
-      //console.error('Ошибка при получении данных игрока:', err);
-      return res.status(500).json({
-        message: "Ошибка при получении данных игрока",
-        error: err.message,
-      });
-    }
-
-    if (!player) {
-      return res.status(404).json({
-        message: `Игрок с ID ${playerId} не найден`,
-      });
-    }
-
-    // Отправляем данные игрока
-    res.json(player);
-  });
-});
-
-// Обновляем маршрут PUT для редактирования игрока
-app.put("/api/players/:id", upload.single("avatar"), (req, res) => {
-  const playerId = req.params.id;
-  const { nickname, realName, steam64, teamId } = req.body;
-
-  // Проверяем существование игрока перед обновлением
-  db.get("SELECT id FROM players WHERE id = ?", [playerId], (err, player) => {
-    if (err) {
-      //console.error('Ошибка при проверке игрока:', err);
-      return res.status(500).json({ message: "Ошибка сервера" });
-    }
-
-    if (!player) {
-      return res
-        .status(404)
-        .json({ message: `Игрок с ID ${playerId} не найден` });
-    }
-
-    // Если игрок найден, обновляем данные
-    // Сохраняем только имя файла, без /uploads/
-    const avatar = req.file ? req.file.filename : null;
-    let updateQuery =
-      "UPDATE players SET nickname = ?, realName = ?, steam64 = ?, teamId = ?";
-    let params = [nickname, realName, steam64, teamId];
-
-    if (avatar) {
-      updateQuery += ", avatar = ?";
-      params.push(avatar);
-    }
-
-    updateQuery += " WHERE id = ?";
-    params.push(playerId);
-
-    db.run(updateQuery, params, function (err) {
-      if (err) {
-        //console.error('Ошибка при обновлении:', err);
-        return res
-          .status(500)
-          .json({ message: "Ошибка при обновлении игрока" });
-      }
-
-      res.json({
-        message: "Игрок успешно обновлен",
-        playerId: playerId,
-      });
-    });
-  });
-});
-
-// ... existing code ...
-
-// Добавляем новый эндпоинт для получения игроков команды
 app.get("/api/teams/:teamId/players", (req, res) => {
   const teamId = req.params.teamId;
 
