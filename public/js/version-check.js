@@ -1,5 +1,5 @@
 // Текущая версия приложения - обновляйте это значение при каждом релизе
-const CURRENT_VERSION = "1.0.7";
+const CURRENT_VERSION = "1.0.8";
 
 // Функция для проверки обновлений
 async function checkForUpdates() {
