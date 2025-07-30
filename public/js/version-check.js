@@ -1,43 +1,54 @@
 // Текущая версия приложения - обновляйте это значение при каждом релизе
-const CURRENT_VERSION = "1.0.9";
+const CURRENT_VERSION = "1.0.5";
+
+// Получаем локальную версию с сервера
+async function getLocalVersion() {
+    try {
+        const response = await fetch('/api/version', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Ошибка получения локальной версии');
+        const data = await response.json();
+        return data.version;
+    } catch (e) {
+        console.error('Ошибка при получении локальной версии:', e);
+        return null;
+    }
+}
 
 // Функция для проверки обновлений
 async function checkForUpdates() {
     try {
-        console.log("Проверка обновлений...");
-        
-        // Используем локальную версию из константы
-        const currentVersion = CURRENT_VERSION;
-        
+        console.log('Проверка обновлений...');
+        // Получаем локальную версию с сервера
+        const currentVersion = await getLocalVersion();
+        if (!currentVersion) return false;
+
         // Получаем последнюю версию напрямую с GitHub
-        const response = await fetch("https://raw.githubusercontent.com/fyflo/CS2_Manager_HUD/main/package.json", {
-            cache: "no-store",
-            mode: "cors"
+        const response = await fetch('https://raw.githubusercontent.com/fyflo/CS2_Manager_HUD/main/package.json', {
+            cache: 'no-store',
+            mode: 'cors'
         });
-        
         if (!response.ok) {
             throw new Error(`Ошибка HTTP: ${response.status}`);
         }
-        
         const data = await response.json();
         const latestVersion = data.version;
-        
+
         console.log(`Текущая версия: ${currentVersion}`);
         console.log(`Последняя версия: ${latestVersion}`);
-        
+
         // Сравниваем версии
         const needsUpdate = compareVersions(currentVersion, latestVersion) < 0;
-        
+
         if (needsUpdate) {
-            console.log("Доступно обновление!");
+            console.log('Доступно обновление!');
             showUpdateNotification(currentVersion, latestVersion);
             return true;
         } else {
-            console.log("У вас установлена последняя версия.");
+            console.log('У вас установлена последняя версия.');
             return false;
         }
     } catch (error) {
-        console.error("Ошибка при проверке обновлений:", error);
+        console.error('Ошибка при проверке обновлений:', error);
         return false;
     }
 }
